@@ -1,0 +1,7 @@
+project: student_dropout
+registry: data/registry.db
+provider: local
+online_store:
+    type: sqlite
+offline_store:
+    type: file

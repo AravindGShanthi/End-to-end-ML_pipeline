@@ -1,0 +1,44 @@
+# --- Python & Environments ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+
+# --- DVC (Data Version Control) ---
+# DVC tracks large files; Git should ignore the actual data but track .dvc files
+/data/
+/models/
+# Ignore the internal DVC cache (usually handled automatically by dvc init)
+.dvc/cache/
+.dvc/tmp/
+.dvc/updater
+
+# --- MLflow ---
+# Exclude local experiment tracking data and artifacts
+mlruns/
+mlartifacts/
+outputs/
+*.db
+mlflow.db
+
+# --- Scikit-learn & Training Artifacts ---
+# Exclude serialized models (should be tracked by DVC or MLflow)
+*.pkl
+*.joblib
+*.pth
+*.pt
+*.onnx
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# --- IDEs & OS ---
+.vscode/
+.idea/
+.DS_Store
+
+*.parquet
