@@ -19,13 +19,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-store = FeatureStore(repo_path="student_feature")
+store = FeatureStore(repo_path="features")
 
 entity_df = pd.DataFrame(
     {
         "student_id": range(1044),
         "event_timestamp": pd.to_datetime(
-            ["2026-02-19 14:30:49.982622" for x in range(1044)]
+            ["2026-02-20 11:22:24.079496" for x in range(1044)]
         ),
     }
 )
@@ -44,7 +44,7 @@ X = store.get_historical_features(
     ],
 ).to_df()
 
-y_df = pd.read_parquet("data/raw/labels.parquet")
+y_df = pd.read_parquet("data/processed/labels.parquet")
 y_df["event_timestamp"] = pd.to_datetime(y_df["event_timestamp"], utc=True)
 
 print(y_df, X)

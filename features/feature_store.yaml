@@ -1,4 +1,4 @@
-project: student_dropout
+project: features
 registry: data/registry.db
 provider: local
 online_store:

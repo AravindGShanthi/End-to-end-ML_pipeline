@@ -7,7 +7,8 @@ from feast.types import Float64, Int64
 student = Entity(name="student_id", join_keys=["student_id"])
 
 student_source = FileSource(
-    path="data/raw/student_features.parquet", timestamp_field="event_timestamp"
+    path="../data/processed/student_features.parquet",
+    timestamp_field="event_timestamp",
 )
 
 student_features = FeatureView(
