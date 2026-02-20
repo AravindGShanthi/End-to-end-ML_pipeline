@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  etl:
+    cmd: python src/etl.py
+    deps:
+    - path: src/etl.py
+      hash: md5
+      md5: 6cd4187c4af9950b80824539518e718a
+      size: 1000
+    outs:
+    - path: data/processed/labels.parquet
+      hash: md5
+      md5: b4705818b69f6eb2d8b51e861428de2d
+      size: 8249
+    - path: data/processed/student_features.parquet
+      hash: md5
+      md5: 40d44fac95da886fc541d6fc9a73224d
+      size: 39058

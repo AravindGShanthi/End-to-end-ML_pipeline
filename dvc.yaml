@@ -1,0 +1,8 @@
+stages:
+  etl:
+    cmd: python src/etl.py
+    deps:
+    - src/etl.py
+    outs:
+    - data/processed/labels.parquet
+    - data/processed/student_features.parquet

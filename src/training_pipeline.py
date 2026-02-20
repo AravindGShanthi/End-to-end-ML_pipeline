@@ -44,7 +44,7 @@ X = store.get_historical_features(
     ],
 ).to_df()
 
-y_df = pd.read_parquet("student_feature/data/labels.parquet")
+y_df = pd.read_parquet("data/raw/labels.parquet")
 y_df["event_timestamp"] = pd.to_datetime(y_df["event_timestamp"], utc=True)
 
 print(y_df, X)

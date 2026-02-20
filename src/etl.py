@@ -21,12 +21,14 @@ df["dropout"] = (df["G3"] < MARK_THRESHOLD).astype(int)
 
 print(df.info())
 
-df.to_parquet("student_feature/data/student_features.parquet", index=False)
+df.to_parquet("data/processed/student_features.parquet", index=False)
 df[["student_id", "event_timestamp", "dropout"]].to_parquet(
-    "student_feature/data/labels.parquet", index=False
+    "data/processed/labels.parquet", index=False
 )
 
 print("-" * 100)
 # Store in columnar data storage for Big data
-print(pd.read_parquet("student_feature/data/student_features.parquet"))
-print(pd.read_parquet("student_feature/data/labels.parquet"))
+print(pd.read_parquet("data/processed/student_features.parquet"))
+print(pd.read_parquet("data/processed/labels.parquet"))
+
+print("DONE")

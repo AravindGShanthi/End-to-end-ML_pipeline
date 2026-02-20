@@ -1,5 +1,0 @@
-outs:
-- md5: 84b53a75e71b7955efc6792b86310eeb
-  size: 8249
-  hash: md5
-  path: labels.parquet
