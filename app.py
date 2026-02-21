@@ -114,7 +114,7 @@ def commit_codeRepo(commit_msg="Auto commit: Retrain"):
             authenticated_url = (
                 f"https://{os.getenv('GIT_USER_NAME')}:{github_token}@{github_repo}"
             )
-            print("AUTH => ", authenticated_url)
+            print("AUTH => ", authenticated_url, flush=True)
             subprocess.run(
                 ["git", "remote", "set-url", "origin", authenticated_url], check=True
             )
