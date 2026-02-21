@@ -46,8 +46,8 @@ stages:
       size: 39133
     - path: src/drift.py
       hash: md5
-      md5: 0dee2f4e53e6d14d4d8620a9c12ebdeb
-      size: 4109
+      md5: 711910ded99096319182c77bed2bdbac
+      size: 4065
     outs:
     - path: metrics/drift.json
       hash: md5
