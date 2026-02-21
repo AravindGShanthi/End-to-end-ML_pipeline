@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import matplotlib.pyplot as plt
@@ -24,6 +25,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+os.environ["MLFLOW_HTTP_REQUEST_TIMEOUT"] = "5"
 store = FeatureStore(repo_path="features")
 
 offline_df = pd.read_parquet("data/processed/student_features.parquet")
@@ -55,6 +57,14 @@ print("traning_df", traning_df)
 
 X = traning_df.drop(columns=["dropout", "student_id", "event_timestamp"])
 Y = traning_df["dropout"]
+
+
+client = MlflowClient()
+
+exp = client.get_experiment_by_name("student-performance")
+
+if exp and exp.lifecycle_stage == "deleted":
+    client.restore_experiment(exp.experiment_id)
 
 mlflow.set_experiment("student-performance")
 
@@ -91,32 +101,36 @@ def get_git_commit():
 
 
 def detect_threshold_drift(model_name, new_threshold, drift_limit=0.05):
-    client = mlflow.tracking.MlflowClient()
+    try:
+        client = mlflow.tracking.MlflowClient()
 
-    lastest_version = client.get_latest_versions(
-        model_name,
-    )
+        lastest_version = client.get_latest_versions(
+            model_name,
+        )
 
-    if not lastest_version:
-        print("No Previous production model found")
-        return None, False
+        if not lastest_version:
+            print("No Previous production model found")
+            return None, False
 
-    lastest_run_id = lastest_version[0].run_id
+        lastest_run_id = lastest_version[0].run_id
 
-    previous_threshold = float(
-        client.get_run(lastest_run_id).data.params.get("decision_threshold", 0.5)
-    )
+        previous_threshold = float(
+            client.get_run(lastest_run_id).data.params.get("decision_threshold", 0.5)
+        )
 
-    drift = abs(new_threshold - previous_threshold)
+        drift = abs(new_threshold - previous_threshold)
 
-    drift_detected = drift > drift_limit
+        drift_detected = drift > drift_limit
 
-    print(f"Previous Threshold: {previous_threshold}")
-    print(f"New Threshold: {new_threshold}")
-    print(f"Threshold Drift: {drift}")
-    print(f"Drift Detected (> {drift_limit}): {drift_detected}")
+        print(f"Previous Threshold: {previous_threshold}")
+        print(f"New Threshold: {new_threshold}")
+        print(f"Threshold Drift: {drift}")
+        print(f"Drift Detected (> {drift_limit}): {drift_detected}")
 
-    return drift, drift_detected
+        return drift, drift_detected
+    except Exception as e:
+        print("Registered model not found. Skipping drift", e, flush=True)
+        return None, None
 
 
 def train_with_auto_threshold():
@@ -201,8 +215,6 @@ def train_with_auto_threshold():
         if drift is not None:
             mlflow.log_metric("threshold_drift", drift)
             mlflow.log_metric("threshold_drift_flag", drift_flag)
-
-    client = MlflowClient()
 
     lastest_version = client.get_latest_versions("student_dropout_model")[0].version
 

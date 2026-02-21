@@ -6,37 +6,47 @@ import tempfile
 import mlflow
 import numpy as np
 import pandas as pd
-from feast import FeatureStore
 from mlflow.tracking import MlflowClient
 
-from training_pipeline import train_with_auto_threshold
-
-MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
+MLFLOW_TRACKING_URI = "http://mlflow:5001"
 MODEL_NAME = "student_dropout_model"
 CURRENT_FEATURE_PATH = "data/processed/student_features.parquet"
 DRIFT_THRESHOLD = 0.2
 METRICS_PATH = "metrics/drift.json"
 FEATURE_REPO_PATH = "features"
 
+os.environ["MLFLOW_HTTP_REQUEST_TIMEOUT"] = "5"
+
 
 def get_reference_commit():
-    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-    client = MlflowClient()
+    try:
+        print("get_reference_commit => ", flush=True)
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        print("get_reference_commit mlflow => ", flush=True)
+        client = MlflowClient()
+        print("get_reference_commit client => ", flush=True)
 
-    versions = client.get_latest_versions(MODEL_NAME)
+        model_version = client.get_model_version_by_alias(
+            name=MODEL_NAME, alias="champion"
+        )
+        print("get_reference_commit =>model_version ", model_version, flush=True)
+        run_id = model_version.run_id
 
-    run_id = versions[0].run_id
+        print(run_id, flush=True)
 
-    print(run_id)
+        run = mlflow.get_run(run_id)
+        reference_commit = run.data.params["git_commit"]
 
-    run = mlflow.get_run(run_id)
-    reference_commit = run.data.params["git_commit"]
-
-    print("COmmit => ", reference_commit)
-    return reference_commit
+        print("==> get_reference_pd", flush=True)
+        print("COmmit => ", reference_commit, flush=True)
+        return reference_commit
+    except Exception as e:
+        print("Registered model not found. Skipping drift", e, flush=True)
+        return None
 
 
 def load_refernce_dataset(reference_commit):
+    print("load_refernce_dataset => ", reference_commit, flush=True)
     temp_dir = tempfile.mkdtemp()
 
     subprocess.run(["git", "clone", ".", temp_dir], check=True)
@@ -51,7 +61,10 @@ def load_refernce_dataset(reference_commit):
 
 
 def get_reference_pd():
+    print("==> get_reference_pd", flush=True)
     reference_commit = get_reference_commit()
+    if reference_commit is None:
+        return None
     return load_refernce_dataset(reference_commit)
 
 
@@ -71,12 +84,21 @@ def calculate_psi(expected, actual, bins=10):
 
 
 def main():
+    print("Drift started==>", flush=True)
     os.makedirs("metrics", exist_ok=True)
 
     # store = FeatureStore(repo_path=FEATURE_REPO_PATH)
     # store.materialize_incremental(end_date=pd.Timestamp.now())
 
     reference_df = get_reference_pd()
+
+    if reference_df is None:
+        print("Drift not happening", flush=True)
+        from training_pipeline import train_with_auto_threshold
+
+        train_with_auto_threshold()
+        return
+
     current_df = pd.read_parquet(CURRENT_FEATURE_PATH)
 
     numeric_cols = reference_df.select_dtypes(include=np.number).columns
@@ -107,6 +129,8 @@ def main():
         print("No training needed")
     else:
         print("Re-training")
+        from training_pipeline import train_with_auto_threshold
+
         train_with_auto_threshold()
 
     with open(METRICS_PATH, "w") as f:

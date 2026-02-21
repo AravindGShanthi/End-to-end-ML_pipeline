@@ -184,6 +184,7 @@ uvicorn-worker==0.3.0
 uvloop==0.22.1
 vine==5.1.0
 voluptuous==0.16.0
+watchdog==6.0.0
 watchfiles==1.1.1
 wcwidth==0.6.0
 websockets==16.0

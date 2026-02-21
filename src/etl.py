@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 
-d1 = pd.read_csv("dataset/student-mat.csv", sep=";")
-d2 = pd.read_csv("dataset/student-por.csv", sep=";")
+df = pd.read_csv("dataset/student-dataset.csv", sep=";")
+# d2 = pd.read_csv("dataset/student-por.csv", sep=";")
 
-df = pd.concat([d1, d2], ignore_index=True)
+# df = pd.concat([d1, d2], ignore_index=True)
 
 # ETL Process
 # Apply log transform for skewed dataset

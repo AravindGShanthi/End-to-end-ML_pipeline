@@ -6,18 +6,37 @@ from datetime import datetime
 
 import mlflow.pyfunc
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from feast import FeatureStore
 from pydantic import BaseModel
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
+
 FEAST_REPO_PATH = "features"
 MODEL_URI = "models:/student_dropout_model@champion"
 
-model = mlflow.pyfunc.load_model(MODEL_URI)
 store = FeatureStore(repo_path=FEAST_REPO_PATH)
 app = FastAPI(title="student dropout prediction API")
+
+model = None
+model_lock = threading.Lock()
+
+
+def load_model():
+    global model
+    print("Loading model from MLflow...", flush=True)
+    model = mlflow.pyfunc.load_model(MODEL_URI)
+    print("Model loaded successfully.", flush=True)
+
+
+def get_model():
+    global model
+    with model_lock:
+        if model is None:
+            load_model()
+        return model
 
 
 class StudentRequest(BaseModel):
@@ -60,9 +79,15 @@ def predict(request: StudentRequest):
 
     feature_vector = feature_vector[EXPECTED_FEATURES]
 
-    print(feature_vector)
+    print("feature_vector", flush=True)
+    print(feature_vector, flush=True)
 
-    prediction = model.predict(feature_vector)
+    model_final = get_model()
+    try:
+        model_final = get_model()
+        prediction = model_final.predict(feature_vector)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     return {
         "student_id": request.student_id,
@@ -70,11 +95,35 @@ def predict(request: StudentRequest):
     }
 
 
+def run_pipeline():
+    print("Starting retraining piepline...", flush=True)
+
+    process = subprocess.Popen(
+        ["./run_pipeline.sh"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+    )
+
+    for line in process.stdout:
+        print(line, end="", flush=True)
+
+    process.wait()
+
+    print("Pipeline finished", flush=True)
+
+    with model_lock:
+        print("reloading model after retrain...", flush=True)
+        load_model()
+
+
 class DatasetChangeHanlder(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory:
-            print("New dataset file detected")
-            subprocess.run(["./run_pipeline.sh"])
+            print("New dataset file detected", flush=True)
+
+            threading.Thread(target=run_pipeline, daemon=True).start()
 
 
 def start_watcher():
