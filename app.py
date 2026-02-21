@@ -143,6 +143,7 @@ def run_pipeline():
         text=True,
         bufsize=1,
     )
+
     for line in process.stdout:
         print(line, end="", flush=True)
 
