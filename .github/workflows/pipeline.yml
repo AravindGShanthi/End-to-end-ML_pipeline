@@ -7,22 +7,36 @@ on:
     paths:
       - 'src/**'
       - 'dvc.yaml'
+      - 'requirements.txt'
     
 jobs:
   pipeline:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      MLFLOW_TRACKING_URI: http://mlflow:5001
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout registry
+        uses: actions/checkout@v3
 
-      - name: Install dvc
-        run: pip install dvc
+      - name: Set up Python
+        uses: actions/checkout@v3
+        with:
+          python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install DVC
+        run: pip install dvc[s3]
+
+      - name: Install python requirements
         run: pip install -r requirements.txt
 
-      - name: Run DVP pipeline
-        run: dvc repro
+      - name: Pull DVC data
+        run: dvc pull
 
-      - name: Push artifacts
+      - name: Run DVC Repro
+        run: dvc repro --force
+
+      - name: Push DVC Artifacts
         run: dvc push

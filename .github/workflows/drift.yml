@@ -3,16 +3,36 @@ name: Daily Drift Check
 on:
   schedule:
     - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   drift:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Run Drift
-        run: python src/drift.py
+      - name: Build Docker images
+        run: |
+          docker build -t mlflow_server -f Dockerfile.mlflow .
+          docker build -t fastapi_app -f Dockerfile.api .
+
+      - name: Start Services
+        run: |
+          docker compose up -d
+          # Wait for MLFlow to Start
+          echo "Waiting for MLFlow to be ready..."
+          sleep 10
+
+      - name: Run Drift Check
+        run: | 
+          docker compose exec -T fastapi_app python src/drift.py
+        env:
+          MLFLOW_TRACKING_URI: http://mlflow:5001
+
+      - name: Stop Services
+        run: docker compose down
