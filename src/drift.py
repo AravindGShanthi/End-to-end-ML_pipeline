@@ -136,7 +136,7 @@ def main():
     with open(METRICS_PATH, "w") as f:
         json.dump(result, f, indent=4)
 
-    print("Drift result:", result)
+    print("Drift result: ===> ", result)
 
 
 if __name__ == "__main__":
