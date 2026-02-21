@@ -106,6 +106,19 @@ def commit_codeRepo(commit_msg="Auto commit: Retrain"):
         subprocess.run(
             ["git", "config", "--global", "user.email", os.getenv("GIT_USER_EMAIL")]
         )
+
+        github_token = os.getenv("GITHUB_TOKEN")
+        github_repo = os.getenv("GITHUB_REPO_URL")  # e.g., ://github.com
+
+        if github_token and github_repo:
+            authenticated_url = (
+                f"https://{os.getenv('GIT_USER_NAME')}:{github_token}@{github_repo}"
+            )
+            print("AUTH => ", authenticated_url)
+            subprocess.run(
+                ["git", "remote", "set-url", "origin", authenticated_url], check=True
+            )
+
         print("Staging DVC changes...", flush=True)
         subprocess.run(["dvc", "add", "."], check=False)
 
