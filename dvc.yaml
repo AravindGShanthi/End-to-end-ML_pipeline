@@ -7,6 +7,14 @@ stages:
     - data/processed/labels.parquet
     - data/processed/student_features.parquet
 
+  feast_setup:
+    cmd: python src/feast_setup.py
+    deps:
+      - data/processed/student_features.parquet
+      - src/feast_setup.py
+    outs:
+      - features/data/registry.db
+
   feast_materialize:
     cmd: python src/materialize.py
     deps:

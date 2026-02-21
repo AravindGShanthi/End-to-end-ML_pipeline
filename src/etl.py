@@ -15,7 +15,7 @@ df["fail_abs"] = df["failures"] * df["absences"]
 
 # Add student_id and timestamp for Feast feature store
 df["student_id"] = range(len(df))
-df["event_timestamp"] = pd.Timestamp.now()
+df["event_timestamp"] = pd.Timestamp.utcnow()
 MARK_THRESHOLD = 10
 df["dropout"] = (df["G3"] < MARK_THRESHOLD).astype(int)
 
