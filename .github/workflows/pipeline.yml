@@ -1,0 +1,28 @@
+name: MLOps pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'dvc.yaml'
+    
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dvc
+        run: pip install dvc
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run DVP pipeline
+        run: dvc repro
+
+      - name: Push artifacts
+        run: dvc push

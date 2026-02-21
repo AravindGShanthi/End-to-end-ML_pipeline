@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from feast import FeatureStore
+from mlflow.tracking import MlflowClient
 from sklearn.base import clone
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
@@ -194,10 +195,20 @@ def train_with_auto_threshold():
         git_commit = get_git_commit()
         mlflow.log_param("git_commit", git_commit)
         print("Logged to MLFlow successfully")
+        feature_order = X_train.columns.tolist()
+        mlflow.log_param("feature_order", feature_order)
 
         if drift is not None:
             mlflow.log_metric("threshold_drift", drift)
             mlflow.log_metric("threshold_drift_flag", drift_flag)
+
+    client = MlflowClient()
+
+    lastest_version = client.get_latest_versions("student_dropout_model")[0].version
+
+    client.set_registered_model_alias(
+        name="student_dropout_model", alias="champion", version=lastest_version
+    )
 
 
 if __name__ == "__main__":
