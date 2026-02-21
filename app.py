@@ -26,9 +26,12 @@ model_lock = threading.Lock()
 
 def load_model():
     global model
-    print("Loading model from MLflow...", flush=True)
-    model = mlflow.pyfunc.load_model(MODEL_URI)
-    print("Model loaded successfully.", flush=True)
+    try:
+        print("Loading model from MLflow...", flush=True)
+        model = mlflow.pyfunc.load_model(MODEL_URI)
+        print("Model loaded successfully.", flush=True)
+    except Exception as e:
+        print("Error loading model ", e)
 
 
 def get_model():
@@ -95,6 +98,29 @@ def predict(request: StudentRequest):
     }
 
 
+def commit_codeRepo(commit_msg="Auto commit: Retrain"):
+    try:
+        subprocess.run(
+            ["git", "config", "--global", "user.name", os.getenv("GIT_USER_NAME")]
+        )
+        subprocess.run(
+            ["git", "config", "--global", "user.email", os.getenv("GIT_USER_EMAIL")]
+        )
+        print("Staging DVC changes...", flush=True)
+        subprocess.run(["dvc", "add", "."], check=False)
+
+        print("Staging git changes...", flush=True)
+        subprocess.run(["git", "add", "."], check=True)
+
+        print("Commiting git changes...", flush=True)
+        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+
+        print("Pushing git changes...", flush=True)
+        subprocess.run(["git", "push"], check=True)
+    except subprocess.CalledProcessError as e:
+        print("Error commiting_codeRepo => ", flush=True)
+
+
 def run_pipeline():
     print("Starting retraining piepline...", flush=True)
 
@@ -116,6 +142,7 @@ def run_pipeline():
     with model_lock:
         print("reloading model after retrain...", flush=True)
         load_model()
+        commit_codeRepo("Auto update dvc.lock and metrics after retraining")
 
 
 class DatasetChangeHanlder(FileSystemEventHandler):
