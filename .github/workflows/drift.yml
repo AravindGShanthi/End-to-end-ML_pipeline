@@ -1,0 +1,18 @@
+name: Daily Drift Check
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Drift
+        run: python src/drift.py

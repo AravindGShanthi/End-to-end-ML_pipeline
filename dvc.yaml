@@ -3,6 +3,7 @@ stages:
     cmd: python src/etl.py
     deps:
     - src/etl.py
+    - dataset/
     outs:
     - data/processed/labels.parquet
     - data/processed/student_features.parquet
@@ -10,7 +11,6 @@ stages:
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
-      - data/processed/student_features.parquet
       - src/feast_setup.py
     outs:
       - features/data/registry.db
