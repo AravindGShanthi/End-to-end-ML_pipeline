@@ -6,3 +6,19 @@ stages:
     outs:
     - data/processed/labels.parquet
     - data/processed/student_features.parquet
+
+  feast_materialize:
+    cmd: python src/materialize.py
+    deps:
+    - data/processed/student_features.parquet
+    - src/materialize.py
+    outs:
+    - data/feast_materialized.marker
+
+  drift:
+    cmd: python src/drift.py
+    deps:
+    - data/processed/student_features.parquet
+    - src/drift.py
+    outs:
+    - metrics/drift.json

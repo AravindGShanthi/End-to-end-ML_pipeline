@@ -1,3 +1,5 @@
+import subprocess
+
 import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
@@ -5,30 +7,27 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from feast import FeatureStore
+from sklearn.base import clone
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     f1_score,
+    precision_recall_curve,
     precision_score,
     recall_score,
     roc_auc_score,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 store = FeatureStore(repo_path="features")
 
-entity_df = pd.DataFrame(
-    {
-        "student_id": range(1044),
-        "event_timestamp": pd.to_datetime(
-            ["2026-02-20 11:22:24.079496" for x in range(1044)]
-        ),
-    }
-)
+offline_df = pd.read_parquet("data/processed/student_features.parquet")
+
+entity_df = offline_df[["student_id", "event_timestamp"]]
 
 X = store.get_historical_features(
     entity_df=entity_df,
@@ -56,13 +55,74 @@ print("traning_df", traning_df)
 X = traning_df.drop(columns=["dropout", "student_id", "event_timestamp"])
 Y = traning_df["dropout"]
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, Y, test_size=0.2, stratify=Y, random_state=42
-)
-
 mlflow.set_experiment("student-performance")
 
-with mlflow.start_run():
+
+def find_stable_threshold(model, X, y, n_splits=5):
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+
+    thresholds = []
+
+    for train_idx, val_idx in skf.split(X, y):
+        X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+        y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+
+        model_clone = clone(model)
+        model_clone.fit(X_train, y_train)
+
+        y_prob = model_clone.predict_proba(X_val)[:, 1]
+
+        precision, recall, thr = precision_recall_curve(y_val, y_prob)
+
+        f1_scores = 2 * (precision * recall) / (precision + recall + 1e-8)
+
+        print("--" * 100)
+        print(f1_scores)
+
+        best_thr = thr[np.argmax(f1_scores[:-1])]
+        thresholds.append(best_thr)
+
+    return np.median(thresholds), np.std(thresholds)
+
+
+def get_git_commit():
+    return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+
+
+def detect_threshold_drift(model_name, new_threshold, drift_limit=0.05):
+    client = mlflow.tracking.MlflowClient()
+
+    lastest_version = client.get_latest_versions(
+        model_name,
+    )
+
+    if not lastest_version:
+        print("No Previous production model found")
+        return None, False
+
+    lastest_run_id = lastest_version[0].run_id
+
+    previous_threshold = float(
+        client.get_run(lastest_run_id).data.params.get("decision_threshold", 0.5)
+    )
+
+    drift = abs(new_threshold - previous_threshold)
+
+    drift_detected = drift > drift_limit
+
+    print(f"Previous Threshold: {previous_threshold}")
+    print(f"New Threshold: {new_threshold}")
+    print(f"Threshold Drift: {drift}")
+    print(f"Drift Detected (> {drift_limit}): {drift_detected}")
+
+    return drift, drift_detected
+
+
+def train_with_auto_threshold():
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, Y, test_size=0.2, stratify=Y, random_state=42
+    )
+
     pipeline = Pipeline(
         [
             ("scaler", StandardScaler()),
@@ -75,11 +135,18 @@ with mlflow.start_run():
         ]
     )
 
+    best_threshold, threshold_std = find_stable_threshold(pipeline, X_train, y_train)
+
+    print("--" * 100)
+    print("Best threshold => ", best_threshold)
+    print("Best threshold_std => ", threshold_std)
+    print("--" * 100)
+
     # Train
     pipeline.fit(X_train, y_train)
-    MODEL_THRESHOLD = 0.31
+    MODEL_THRESHOLD = best_threshold
     # Predict
-    y_pred = pipeline.predict(X_test)
+    # y_pred = pipeline.predict(X_test)
     y_prob = pipeline.predict_proba(X_test)[:, 1]
     y_pred = (y_prob > MODEL_THRESHOLD).astype(int)
 
@@ -96,37 +163,42 @@ with mlflow.start_run():
     print("f1_score", f1)
     print("roc_auc", auc)
 
-    # Log Metrics
-    mlflow.log_metric("accuracy", acc)
-    mlflow.log_metric("precision", precision)
-    mlflow.log_metric("recall", recall)
-    mlflow.log_metric("f1_score", f1)
-    mlflow.log_metric("roc_auc", auc)
+    drift, drift_flag = detect_threshold_drift("student_dropout_model", best_threshold)
 
-    # Log parametrics
-    mlflow.log_param("model", "LogisticRegression")
-    mlflow.log_param("calibraction", "isotonic")
+    with mlflow.start_run():
+        # Log Metrics
+        mlflow.log_metric("accuracy", acc)
+        mlflow.log_metric("precision", precision)
+        mlflow.log_metric("recall", recall)
+        mlflow.log_metric("f1_score", f1)
+        mlflow.log_metric("roc_auc", auc)
 
-    # Log model
-    mlflow.sklearn.log_model(
-        pipeline, "model", registered_model_name="student_dropout_model"
-    )
+        # Log parametrics
+        mlflow.log_param("model", "LogisticRegression")
+        mlflow.log_param("calibraction", "isotonic")
 
-    cm = confusion_matrix(y_test, y_pred)
+        # Log model
+        mlflow.sklearn.log_model(
+            pipeline, "model", registered_model_name="student_dropout_model"
+        )
 
-    plt.figure()
-    sns.heatmap(cm, annot=True, fmt="d")
-    plt.title("Confusion Matrix")
-    plt.savefig("confustion_matrix.png")
+        cm = confusion_matrix(y_test, y_pred)
 
-    mlflow.log_artifact("confustion_matrix.png")
-    mlflow.log_param("decision_threshold", MODEL_THRESHOLD)
-    print("Logged to MLFlow successfully")
+        plt.figure()
+        sns.heatmap(cm, annot=True, fmt="d")
+        plt.title("Confusion Matrix")
+        plt.savefig("confustion_matrix.png")
 
-    # for threshold in [0.31]:
-    #     y_pred_thresh = (y_prob > threshold).astype(int)
+        mlflow.log_artifact("confustion_matrix.png")
+        mlflow.log_param("decision_threshold", MODEL_THRESHOLD)
+        git_commit = get_git_commit()
+        mlflow.log_param("git_commit", git_commit)
+        print("Logged to MLFlow successfully")
 
-    #     print(f"\nThreshold: {threshold}")
-    #     print("Precision:", precision_score(y_test, y_pred_thresh))
-    #     print("Recall:", recall_score(y_test, y_pred_thresh))
-    #     print("F1:", f1_score(y_test, y_pred_thresh))
+        if drift is not None:
+            mlflow.log_metric("threshold_drift", drift)
+            mlflow.log_metric("threshold_drift_flag", drift_flag)
+
+
+if __name__ == "__main__":
+    train_with_auto_threshold()
