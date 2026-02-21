@@ -7,6 +7,8 @@ services:
     ports:
       - "6379:6379"
     restart: always
+    volumes:
+      - redis_data:/data
 
   mlflow:
     build:
@@ -17,8 +19,8 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./mlruns:/mlruns
-      - ./mlflow.db:/mlflow.db
+      - mlruns_data:/mlruns
+      - mlflow_db:/mlflow.db
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5001
     command: >
@@ -48,4 +50,11 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5001
     volumes:
       - .:/app
+      - dvc_cache:/app/.dvc/cache
     restart: always
+
+volumes:
+  redis_data:
+  mlruns_data:
+  mlflow_db:
+  dvc_cache:
