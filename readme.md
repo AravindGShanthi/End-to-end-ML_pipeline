@@ -1,3 +1,19 @@
+# Dataset
+
+This project uses the [UCI Student Performance Dataset](https://archive.ics.uci.edu/dataset/320/student+performance). This dataset contains student achievement data in secondary education of two Portuguese schools. The data includes student grades, demographic, social, and school-related features, and is commonly used for predictive modeling tasks such as dropout prediction, grade prediction, and more.
+
+Key features include:
+- Demographics (age, gender, family background)
+- Academic performance (grades, failures)
+- Attendance and study time
+- Social and family factors
+
+For more details, see the [UCI dataset page](https://archive.ics.uci.edu/dataset/320/student+performance).
+
+## Reference Kaggle Notebook
+
+For a detailed exploratory analysis and baseline model, see my Kaggle notebook: [UCI Student Dropout Prediction Model](https://www.kaggle.com/code/aravindgshanthi/uci-student-dropout-prediction-model)
+
 # DVC Pipeline Architecture
 
 This project uses DVC (Data Version Control) to orchestrate and version the ML pipeline steps. The pipeline is defined in `dvc.yaml` and consists of the following stages:
@@ -89,12 +105,3 @@ uvicorn app:app --reload
 # 7. Start MLflow server (if not using Docker Compose)
 mlflow server --backend-store-uri $MLFLOW_BACKEND_STORE_URI --default-artifact-root s3://your-bucket/mlruns --host 0.0.0.0 --port 5001
 ```
-
-TODO:
-For production, you might want:
-
-PostgreSQL instead of SQLite for MLflow DB (--backend-store-uri postgresql://...)
-
-S3/MinIO for MLflow artifacts (--default-artifact-root s3://bucket/mlruns)
-
-Redis password for security
