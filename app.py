@@ -110,6 +110,8 @@ def commit_codeRepo(commit_msg="Auto commit: Retrain"):
         github_token = os.getenv("GITHUB_TOKEN")
         github_repo = os.getenv("GITHUB_REPO_URL")  # e.g., ://github.com
 
+        print(github_repo, github_token, flush=True)
+
         if github_token and github_repo:
             authenticated_url = (
                 f"https://{os.getenv('GIT_USER_NAME')}:{github_token}@{github_repo}"
