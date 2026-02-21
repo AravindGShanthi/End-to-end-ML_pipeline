@@ -131,6 +131,7 @@ def commit_codeRepo(commit_msg="Auto commit: Retrain"):
         print("Pushing git changes...", flush=True)
         subprocess.run(["git", "push"], check=True)
     except subprocess.CalledProcessError as e:
+        print(e, flush=True)
         print("Error commiting_codeRepo => ", flush=True)
 
 
