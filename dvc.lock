@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
-      size: 149985
+      md5: 97f3632d0109b1dc3785024e308ba834.dir
+      size: 146475
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 0611996ba8d6039be9dbb6b16d19be63
+      md5: e88bc78f3c122dbee94e7cf9745e7097
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: dcea301454fe348e16505d1f7ad7abf5
-      size: 39133
+      md5: dd62011cb16b4e160f6e1df14f7c514f
+      size: 39153
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 2bc2fed913a9841ab376554b27e32041
-      size: 880
+      md5: 11def42e29b7ec90da486c709b0daebb
+      size: 867
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: dcea301454fe348e16505d1f7ad7abf5
-      size: 39133
+      md5: dd62011cb16b4e160f6e1df14f7c514f
+      size: 39153
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 9138aa7392995e7fa716e2fd8dc96daf
+      md5: 2242f89e8b2d662d8992713e05b1a5f5
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: dcea301454fe348e16505d1f7ad7abf5
-      size: 39133
+      md5: dd62011cb16b4e160f6e1df14f7c514f
+      size: 39153
     - path: src/drift.py
       hash: md5
       md5: 44629519096393e933fa23abf60be9c9
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 4fa01711d4c428f0a81d31426c98ce33
-      size: 118
+      md5: a9e370a4a2474b975c31a871a6937ace
+      size: 117
