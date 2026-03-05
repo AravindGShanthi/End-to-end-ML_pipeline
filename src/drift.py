@@ -125,16 +125,20 @@ def main():
         "feature_psi": drift_scores,
     }
 
+    print("RESULT ===> ", flush=True)
+
     if not drift_detected:
-        print("No training needed")
+        print("No training needed", flush=True)
     else:
-        print("Re-training")
+        print("Re-training", flush=True)
         from training_pipeline import train_with_auto_threshold
 
         train_with_auto_threshold()
-
-    with open(METRICS_PATH, "w") as f:
-        json.dump(result, f, indent=4)
+    try:
+        with open(METRICS_PATH, "w") as f:
+            json.dump(result, f, indent=4)
+    except Exception as e:
+        print("ERROR opening : ", e, flush=True)
 
     print("Drift result: ===> ", result)
 
