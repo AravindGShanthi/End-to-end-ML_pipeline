@@ -54,8 +54,8 @@ stages:
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: ed872dadb107514c7feda5adde9f67ef
-      size: 38735
+      md5: 3f544775273b8bf42ecfdc0be18bf85a
+      size: 39133
     - path: src/drift.py
       hash: md5
       md5: ef34ec87eaa3f7e1a56b0280d73bbf53
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 89f012b3c30a0b36a391fc8b8fdb2df2
-      size: 631
+      md5: 1f5a307c02d84d5589baf4cc784d88ed
+      size: 674
