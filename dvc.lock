@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
-      size: 149985
+      md5: 97f3632d0109b1dc3785024e308ba834.dir
+      size: 146475
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 0b86e0a67543a8e58714537624ecf139
+      md5: 5d0e35e21cb7e8efa4ad73d52684c4fc
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 47e10b5bbb2ed0fc183f3fb4e84de259
-      size: 39133
+      md5: d345eaed8a9c88a89602732a66d6448c
+      size: 39153
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 7948baca2a1fc0b1317e5782bba42b09
-      size: 880
+      md5: 7ac6325547ca450859ad8f132a15ebf8
+      size: 867
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 47e10b5bbb2ed0fc183f3fb4e84de259
-      size: 39133
+      md5: d345eaed8a9c88a89602732a66d6448c
+      size: 39153
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: c443d6d38476a39a3c64a49996e8ba57
+      md5: 2334206747adb620490a672cbfa0e86f
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 47e10b5bbb2ed0fc183f3fb4e84de259
-      size: 39133
+      md5: d345eaed8a9c88a89602732a66d6448c
+      size: 39153
     - path: src/drift.py
       hash: md5
       md5: 44629519096393e933fa23abf60be9c9
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 446b9f643e98b18c33c1b5cf616335e1
-      size: 541
+      md5: 8ab88d2d75e4162bbf80faf9ac9c5403
+      size: 584
