@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 81f674e9eac8ed6456b26f15a556333a.dir
-      size: 247304
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 59586ca4b2ad9d32c345b47b8956c43e
+      md5: 1c4926340d2078aff8c15bf59395f02e
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: cbe6de5cddab9c3fa9b80be4698ff949
-      size: 38735
+      md5: 831b37750f7ade063996b5c3d875f37b
+      size: 39131
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -38,8 +38,8 @@ stages:
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: cbe6de5cddab9c3fa9b80be4698ff949
-      size: 38735
+      md5: 831b37750f7ade063996b5c3d875f37b
+      size: 39131
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: c2df35752d6d0069d5ad74fc46928395
+      md5: c01887e395aafd205d381bf0f808d2e9
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: cbe6de5cddab9c3fa9b80be4698ff949
-      size: 38735
+      md5: 831b37750f7ade063996b5c3d875f37b
+      size: 39131
     - path: src/drift.py
       hash: md5
       md5: 1e7df2c03819c00106f3e4fb55bcf55b
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 7ec2cb48f39baa6f058b02fa34857151
-      size: 613
+      md5: 4fa01711d4c428f0a81d31426c98ce33
+      size: 118
