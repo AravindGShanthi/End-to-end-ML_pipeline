@@ -105,3 +105,7 @@ uvicorn app:app --reload
 # 7. Start MLflow server (if not using Docker Compose)
 mlflow server --backend-store-uri $MLFLOW_BACKEND_STORE_URI --default-artifact-root s3://your-bucket/mlruns --host 0.0.0.0 --port 5001
 ```
+
+
+Remove local sync up (DVC)
+dvc gc -w -c
