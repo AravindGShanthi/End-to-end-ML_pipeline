@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 64af1000caeb29ade4f6c88ad62b238a.dir
-      size: 146475
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 60ea8b39793874f8f8b4c8ea789a9982
+      md5: 87c06c08ae33ee8fdaaf9565f309ea0b
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 9b6628e4bd5f24320626e133cf3ecb8c
-      size: 38733
+      md5: 885d46bdb936f32adb1829f46978db08
+      size: 39133
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 37512261c5b5baa3498794db5f9dca5a
+      md5: d00d5317f6235e196b8031004a6614f6
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 9b6628e4bd5f24320626e133cf3ecb8c
-      size: 38733
+      md5: 885d46bdb936f32adb1829f46978db08
+      size: 39133
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: f58728d41858cde2430092b4142ddf76
+      md5: fd6b6bce2225a72634d132cf0bc0da48
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 9b6628e4bd5f24320626e133cf3ecb8c
-      size: 38733
+      md5: 885d46bdb936f32adb1829f46978db08
+      size: 39133
     - path: src/drift.py
       hash: md5
       md5: 1e7df2c03819c00106f3e4fb55bcf55b
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 446b9f643e98b18c33c1b5cf616335e1
-      size: 541
+      md5: e8305fa8c50f33983a787b0138f3ce52
+      size: 613
