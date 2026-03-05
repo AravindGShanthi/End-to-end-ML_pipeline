@@ -121,17 +121,17 @@ def commit_codeRepo(commit_msg="Auto commit: Retrain"):
                 ["git", "remote", "set-url", "origin", authenticated_url], check=True
             )
 
-        print("Staging DVC changes...", flush=True)
-        subprocess.run(["dvc", "add", "."], check=False)
+        # print("Staging DVC changes...", flush=True)
+        # subprocess.run(["dvc", "add", "."], check=False)
 
         print("Staging git changes...", flush=True)
-        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "add", "."], cwd="/app", check=True)
 
         print("Commiting git changes...", flush=True)
-        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+        subprocess.run(["git", "commit", "-m", commit_msg], cwd="/app", check=True)
 
         print("Pushing git changes...", flush=True)
-        subprocess.run(["git", "push"], check=True)
+        subprocess.run(["git", "push"], cwd="/app", check=True)
     except subprocess.CalledProcessError as e:
         print(e, flush=True)
         print("Error commiting_codeRepo => ", flush=True)

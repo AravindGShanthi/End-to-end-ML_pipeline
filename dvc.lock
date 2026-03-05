@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 97f3632d0109b1dc3785024e308ba834.dir
-      size: 146475
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,19 +15,19 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: c22226879c41131c365de0a845c4d8f9
+      md5: 9a512b544efb408b428fbcaeca5a5e5e
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: ca470bada80103e5cea42ead1104f326
-      size: 39153
+      md5: 2c9546bbe5e023e5993507f1df08b005
+      size: 39133
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: ca470bada80103e5cea42ead1104f326
-      size: 39153
+      md5: 2c9546bbe5e023e5993507f1df08b005
+      size: 39133
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -35,15 +35,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 084ba0ac96a6735e61ce48a640d87eb6
+      md5: 4ba168f2cba8e6c28950142880949b07
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: ca470bada80103e5cea42ead1104f326
-      size: 39153
+      md5: 2c9546bbe5e023e5993507f1df08b005
+      size: 39133
     - path: src/drift.py
       hash: md5
       md5: 1e7df2c03819c00106f3e4fb55bcf55b
@@ -51,8 +51,8 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: e1181ea46fecbdeec10653961982d5ae
-      size: 106
+      md5: 4fa01711d4c428f0a81d31426c98ce33
+      size: 118
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 2dbc0b0c59d2cee11154099301327740
-      size: 867
+      md5: e7900c89fce56c21b373465dae5732c6
+      size: 880
