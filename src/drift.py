@@ -53,7 +53,7 @@ def load_refernce_dataset(reference_commit):
 
     subprocess.run(["git", "checkout", reference_commit], cwd=temp_dir, check=True)
 
-    subprocess.run(["dvc", "pull"], cwd=temp_dir, check=True)
+    subprocess.run(["dvc", "pull", "--force"], cwd=temp_dir, check=True)
 
     path = os.path.join(temp_dir, "data/processed/student_features.parquet")
 

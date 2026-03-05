@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 64af1000caeb29ade4f6c88ad62b238a.dir
-      size: 146475
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 4788a6abecbb05d92d8b649addac6cfb
+      md5: aa3ecb5ec171c5b23e0c07f5d8bcb106
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 1bb27322d0659900a10d0db5bb231e0b
-      size: 38733
+      md5: 79a8fb2ecb5a37a336929cd0904a5581
+      size: 39133
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: c488e3664f73bd478df0cafbc7c2f8ae
-      size: 880
+      md5: 5e2aa476edf9309e147fc7555db9071d
+      size: 867
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 1bb27322d0659900a10d0db5bb231e0b
-      size: 38733
+      md5: 79a8fb2ecb5a37a336929cd0904a5581
+      size: 39133
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,21 +47,21 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 76f927cd4a63957ee6b813aa0a3744e1
+      md5: 828d7d68d50a2ed141109873cadeaebd
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 1bb27322d0659900a10d0db5bb231e0b
-      size: 38733
+      md5: 79a8fb2ecb5a37a336929cd0904a5581
+      size: 39133
     - path: src/drift.py
       hash: md5
-      md5: 1e7df2c03819c00106f3e4fb55bcf55b
-      size: 4792
+      md5: 44629519096393e933fa23abf60be9c9
+      size: 4803
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: e1181ea46fecbdeec10653961982d5ae
-      size: 106
+      md5: 4fa01711d4c428f0a81d31426c98ce33
+      size: 118
