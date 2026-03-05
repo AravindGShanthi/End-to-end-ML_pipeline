@@ -2,7 +2,7 @@
 
 echo "Running DVC pipeline..."
 
-dvc repro
+dvc repro --force
 
 if [ $? -eq 0 ]; then
     echo "Pipeline successful. Pushing to remote..."
