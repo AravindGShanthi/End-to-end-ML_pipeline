@@ -98,45 +98,6 @@ def predict(request: StudentRequest):
     }
 
 
-def commit_codeRepo(commit_msg="Auto commit: Retrain"):
-    try:
-        subprocess.run(
-            ["git", "config", "--global", "user.name", os.getenv("GIT_USER_NAME")]
-        )
-        subprocess.run(
-            ["git", "config", "--global", "user.email", os.getenv("GIT_USER_EMAIL")]
-        )
-
-        github_token = os.getenv("GIT_TOKEN")
-        github_repo = os.getenv("GITHUB_REPO_URL")  # e.g., ://github.com
-
-        print(github_repo, github_token, flush=True)
-
-        if github_token and github_repo:
-            authenticated_url = (
-                f"https://{os.getenv('GIT_USER_NAME')}:{github_token}@{github_repo}"
-            )
-            print("AUTH => ", authenticated_url, flush=True)
-            subprocess.run(
-                ["git", "remote", "set-url", "origin", authenticated_url], check=True
-            )
-
-        # print("Staging DVC changes...", flush=True)
-        # subprocess.run(["dvc", "add", "."], check=False)
-
-        print("Staging git changes...", flush=True)
-        subprocess.run(["git", "add", "."], cwd="/app", check=True)
-
-        print("Commiting git changes...", flush=True)
-        subprocess.run(["git", "commit", "-m", commit_msg], cwd="/app", check=True)
-
-        print("Pushing git changes...", flush=True)
-        subprocess.run(["git", "push"], cwd="/app", check=True)
-    except subprocess.CalledProcessError as e:
-        print(e, flush=True)
-        print("Error commiting_codeRepo => ", flush=True)
-
-
 def run_pipeline():
     print("Starting retraining piepline...", flush=True)
     process = subprocess.Popen(
@@ -157,7 +118,6 @@ def run_pipeline():
     with model_lock:
         print("reloading model after retrain...", flush=True)
         load_model()
-        commit_codeRepo("Auto update dvc.lock and metrics after retraining")
 
 
 class DatasetChangeHanlder(FileSystemEventHandler):

@@ -100,6 +100,42 @@ def get_git_commit():
     return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
 
 
+def commit_codeRepo(commit_msg="Auto commit: Retrain"):
+    try:
+        subprocess.run(
+            ["git", "config", "--global", "user.name", os.getenv("GIT_USER_NAME")]
+        )
+        subprocess.run(
+            ["git", "config", "--global", "user.email", os.getenv("GIT_USER_EMAIL")]
+        )
+
+        github_token = os.getenv("GIT_TOKEN")
+        github_repo = os.getenv("GITHUB_REPO_URL")  # e.g., ://github.com
+
+        print(github_repo, github_token, flush=True)
+
+        if github_token and github_repo:
+            authenticated_url = (
+                f"https://{os.getenv('GIT_USER_NAME')}:{github_token}@{github_repo}"
+            )
+            print("AUTH => ", authenticated_url, flush=True)
+            subprocess.run(
+                ["git", "remote", "set-url", "origin", authenticated_url], check=True
+            )
+
+        print("Staging git changes...", flush=True)
+        subprocess.run(["git", "add", "."], cwd="/app", check=True)
+
+        print("Commiting git changes...", flush=True)
+        subprocess.run(["git", "commit", "-m", commit_msg], cwd="/app", check=True)
+
+        print("Pushing git changes...", flush=True)
+        subprocess.run(["git", "push"], cwd="/app", check=True)
+    except subprocess.CalledProcessError as e:
+        print(e, flush=True)
+        print("Error commiting_codeRepo => ", flush=True)
+
+
 def detect_threshold_drift(model_name, new_threshold, drift_limit=0.05):
     try:
         client = mlflow.tracking.MlflowClient()
@@ -206,6 +242,7 @@ def train_with_auto_threshold():
 
         mlflow.log_artifact("confustion_matrix.png")
         mlflow.log_param("decision_threshold", MODEL_THRESHOLD)
+        commit_codeRepo("Auto update dvc.lock and metrics after retraining")
         git_commit = get_git_commit()
         mlflow.log_param("git_commit", git_commit)
         print("Logged to MLFlow successfully")

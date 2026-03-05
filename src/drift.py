@@ -64,8 +64,8 @@ def get_reference_pd():
     print("==> get_reference_pd", flush=True)
     reference_commit = get_reference_commit()
     if reference_commit is None:
-        return None
-    return load_refernce_dataset(reference_commit)
+        return None, None
+    return load_refernce_dataset(reference_commit), reference_commit
 
 
 # Population Density Index
@@ -90,7 +90,7 @@ def main():
     # store = FeatureStore(repo_path=FEATURE_REPO_PATH)
     # store.materialize_incremental(end_date=pd.Timestamp.now())
 
-    reference_df = get_reference_pd()
+    reference_df, reference_commit = get_reference_pd()
 
     if reference_df is None:
         print("Drift not happening", flush=True)
@@ -135,6 +135,10 @@ def main():
         "psi_threshold": DRIFT_THRESHOLD,
         "feature_psi": drift_scores,
     }
+
+    # Only store the commit id when drift is actually detected
+    if drift_detected and reference_commit is not None:
+        result["git_commit"] = reference_commit
 
     print("RESULT ===> ", flush=True)
 
