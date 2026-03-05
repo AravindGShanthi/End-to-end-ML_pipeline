@@ -85,7 +85,7 @@ def calculate_psi(expected, actual, bins=10):
 
 def main():
     print("Drift started==>", flush=True)
-    os.makedirs("metrics", exist_ok=True)
+    # os.makedirs("metrics", exist_ok=True)
 
     # store = FeatureStore(repo_path=FEATURE_REPO_PATH)
     # store.materialize_incremental(end_date=pd.Timestamp.now())
