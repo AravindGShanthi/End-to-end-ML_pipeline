@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 81f674e9eac8ed6456b26f15a556333a.dir
-      size: 247304
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: d7b8a894ff5de526f8d688d592640db7
+      md5: abeab7212d3d40fc560f7b34a18bdf92
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: ed872dadb107514c7feda5adde9f67ef
-      size: 38735
+      md5: 3f544775273b8bf42ecfdc0be18bf85a
+      size: 39133
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: bb28223d3b12f64f7f4df840ec056118
+      md5: 8f464176c2cfc39be4709afb814b6041
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: ed872dadb107514c7feda5adde9f67ef
-      size: 38735
+      md5: 3f544775273b8bf42ecfdc0be18bf85a
+      size: 39133
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 39ceac86a963511bb9db864a007da332
+      md5: 08a237a5fc31dc4878685fe754c77855
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: bed44b7d69c72dbfa6f63016ea945ae4
-      size: 39153
+      md5: ed872dadb107514c7feda5adde9f67ef
+      size: 38735
     - path: src/drift.py
       hash: md5
       md5: ef34ec87eaa3f7e1a56b0280d73bbf53
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 446b9f643e98b18c33c1b5cf616335e1
-      size: 541
+      md5: 89f012b3c30a0b36a391fc8b8fdb2df2
+      size: 631
