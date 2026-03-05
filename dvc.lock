@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
-      size: 149985
+      md5: 97f3632d0109b1dc3785024e308ba834.dir
+      size: 146475
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 4e45c9d81f4a48bfdfa1e62bdeff2e71
+      md5: 6bbd648999e80b5495d251ab0b8e640a
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: d5b4f0cd9cc398fd55b80ae8211dcb96
-      size: 39133
+      md5: c2c3c3d87d353fee525bf3ae1c6242a1
+      size: 39153
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 7b275c7c83e94fef796ee195230bb675
+      md5: d01f7da90e0bc2f4eea4db674502589c
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: d5b4f0cd9cc398fd55b80ae8211dcb96
-      size: 39133
+      md5: c2c3c3d87d353fee525bf3ae1c6242a1
+      size: 39153
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: edd5e354ae8419be4150502cba6247a8
+      md5: 7ca7e6dacfe1ccdcb8867d281287d653
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: d5b4f0cd9cc398fd55b80ae8211dcb96
-      size: 39133
+      md5: c2c3c3d87d353fee525bf3ae1c6242a1
+      size: 39153
     - path: src/drift.py
       hash: md5
       md5: 1e7df2c03819c00106f3e4fb55bcf55b
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 4fa01711d4c428f0a81d31426c98ce33
-      size: 118
+      md5: e1181ea46fecbdeec10653961982d5ae
+      size: 106
