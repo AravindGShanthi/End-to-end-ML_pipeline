@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
-      size: 149985
+      md5: 97f3632d0109b1dc3785024e308ba834.dir
+      size: 146475
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 7ec8db687a11bcc305a28c3b780d0d07
+      md5: 1ddc7cca4c1c501874b03fcac2433ca9
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 9a9294b67c7eb695f8b56592fa92c07d
-      size: 39133
+      md5: d5afc3a45a8633e2e88130d7642f544b
+      size: 39153
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 3509454a8a06122a7a68021e5d3dffba
+      md5: 02045b699afd631e25f336cda02c1061
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 9a9294b67c7eb695f8b56592fa92c07d
-      size: 39133
+      md5: d5afc3a45a8633e2e88130d7642f544b
+      size: 39153
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 449ecef2c6a9b2199269b5f2f8944636
+      md5: cd7619f0cb8dd2262da22cd433df8a41
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 9a9294b67c7eb695f8b56592fa92c07d
-      size: 39133
+      md5: d5afc3a45a8633e2e88130d7642f544b
+      size: 39153
     - path: src/drift.py
       hash: md5
       md5: 44629519096393e933fa23abf60be9c9
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 4fa01711d4c428f0a81d31426c98ce33
-      size: 118
+      md5: a9e370a4a2474b975c31a871a6937ace
+      size: 117
