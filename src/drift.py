@@ -85,7 +85,7 @@ def calculate_psi(expected, actual, bins=10):
 
 def main():
     print("Drift started==>", flush=True)
-    # os.makedirs("metrics", exist_ok=True)
+    os.makedirs("metrics", exist_ok=True)
 
     # store = FeatureStore(repo_path=FEATURE_REPO_PATH)
     # store.materialize_incremental(end_date=pd.Timestamp.now())
@@ -94,6 +94,17 @@ def main():
 
     if reference_df is None:
         print("Drift not happening", flush=True)
+
+        result = {
+            "drift_detected": False,
+            "reason": "no_reference_dataset",
+            "psi_threshold": DRIFT_THRESHOLD,
+            "feature_psi": {},
+        }
+
+        with open(METRICS_PATH, "w") as f:
+            json.dump(result, f, indent=4)
+
         from training_pipeline import train_with_auto_threshold
 
         train_with_auto_threshold()
@@ -144,4 +155,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print("Drift script failed:", e, flush=True)
+
+        os.makedirs("metrics", exist_ok=True)
+
+        result = {"drift_detected": False, "error": str(e)}
+
+        with open(METRICS_PATH, "w") as f:
+            json.dump(result, f, indent=4)
