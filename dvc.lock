@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 64af1000caeb29ade4f6c88ad62b238a.dir
-      size: 146475
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: c1e3668abd5a8fb709a05f6d8b1a1b2c
+      md5: 0a1c2584e2f39c47d59dcade2105e272
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 654159a549e467d5fe0a6ff9c430f5d9
-      size: 38733
+      md5: 2ed6324f2224ce9f5209e8d25f429e89
+      size: 39133
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 162c1e38eba6311e6175c7eaf1912cfc
+      md5: 3f4a2e684068b5d1011b90649261b545
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 654159a549e467d5fe0a6ff9c430f5d9
-      size: 38733
+      md5: 2ed6324f2224ce9f5209e8d25f429e89
+      size: 39133
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 829efa3307a0c8b6108e8e9843376244
+      md5: 51dd13f0c4d587d52cb30b9c4ae55f1e
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 654159a549e467d5fe0a6ff9c430f5d9
-      size: 38733
+      md5: 2ed6324f2224ce9f5209e8d25f429e89
+      size: 39133
     - path: src/drift.py
       hash: md5
       md5: 44629519096393e933fa23abf60be9c9
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 043a3a85361e4236529a971d429ff83c
-      size: 570
+      md5: 446b9f643e98b18c33c1b5cf616335e1
+      size: 541
