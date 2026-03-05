@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
-      size: 149985
+      md5: 64af1000caeb29ade4f6c88ad62b238a.dir
+      size: 146475
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 28e78bb379a55375f43430dc0a48fb2e
+      md5: 60ea8b39793874f8f8b4c8ea789a9982
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: d35b9ae862741ff213344f47ce85a93d
-      size: 39133
+      md5: 9b6628e4bd5f24320626e133cf3ecb8c
+      size: 38733
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: d11786fabc8b5295096502980db5cec9
-      size: 867
+      md5: 37512261c5b5baa3498794db5f9dca5a
+      size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: d35b9ae862741ff213344f47ce85a93d
-      size: 39133
+      md5: 9b6628e4bd5f24320626e133cf3ecb8c
+      size: 38733
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 09f44e716d452696437ea01c16b35db2
+      md5: f58728d41858cde2430092b4142ddf76
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: d35b9ae862741ff213344f47ce85a93d
-      size: 39133
+      md5: 9b6628e4bd5f24320626e133cf3ecb8c
+      size: 38733
     - path: src/drift.py
       hash: md5
       md5: 1e7df2c03819c00106f3e4fb55bcf55b
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 49e3d9bc7ce0900bb509a511449e14e7
-      size: 583
+      md5: 446b9f643e98b18c33c1b5cf616335e1
+      size: 541
