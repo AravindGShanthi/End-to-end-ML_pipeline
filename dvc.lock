@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: 97f3632d0109b1dc3785024e308ba834.dir
-      size: 146475
+      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
+      size: 149985
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: c14e4ff2138a271b48d0066aa7051d3d
+      md5: 3033fa34bdaf80ad33aa0fb50d239c13
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 476010cf42fcfea78b3031acea7e1fe8
-      size: 39153
+      md5: 4067e7f7527128e22d0b8c20526a0161
+      size: 39133
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 6bf3560f8c143f83286f44f32647dcdd
+      md5: d9d6075b20ad1173a8652268707ba187
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 476010cf42fcfea78b3031acea7e1fe8
-      size: 39153
+      md5: 4067e7f7527128e22d0b8c20526a0161
+      size: 39133
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 1d4bde6b7b8573aa299ddd586446d0a7
+      md5: 1235fc0f5c103e85d342399abaa87266
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 476010cf42fcfea78b3031acea7e1fe8
-      size: 39153
+      md5: 4067e7f7527128e22d0b8c20526a0161
+      size: 39133
     - path: src/drift.py
       hash: md5
       md5: 44629519096393e933fa23abf60be9c9
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: a9e370a4a2474b975c31a871a6937ace
-      size: 117
+      md5: 49e3d9bc7ce0900bb509a511449e14e7
+      size: 583
