@@ -5,8 +5,8 @@ stages:
     deps:
     - path: dataset/
       hash: md5
-      md5: c5d10561ed5f11d213c4aafb146ea3d7.dir
-      size: 149985
+      md5: 64af1000caeb29ade4f6c88ad62b238a.dir
+      size: 146475
       nfiles: 1
     - path: src/etl.py
       hash: md5
@@ -15,12 +15,12 @@ stages:
     outs:
     - path: data/processed/labels.parquet
       hash: md5
-      md5: 936a0016fb898842e2a581720a4ae73d
+      md5: e922d45b6294488964669cdab53816a5
       size: 8306
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 4f4b240b4a1e0227e5d1c0fa348cf6f5
-      size: 39133
+      md5: c600ccf28abb37c6954e5fdb00a4ed36
+      size: 38733
   feast_setup:
     cmd: python src/feast_setup.py
     deps:
@@ -31,15 +31,15 @@ stages:
     outs:
     - path: features/data/registry.db
       hash: md5
-      md5: 13765f5bfb2057c5248953bdbf15d8c6
+      md5: 6c2db602215350a8b3f62f34e113c913
       size: 880
   feast_materialize:
     cmd: python src/materialize.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 4f4b240b4a1e0227e5d1c0fa348cf6f5
-      size: 39133
+      md5: c600ccf28abb37c6954e5fdb00a4ed36
+      size: 38733
     - path: src/materialize.py
       hash: md5
       md5: 85d86b6038b24f26ab1a04d67de8e29a
@@ -47,15 +47,15 @@ stages:
     outs:
     - path: data/feast_materialized.marker
       hash: md5
-      md5: 8770b1cfd4fb27cc2bab8f536ca7ddd2
+      md5: a0465349a34c5e63540fe53b53e6de1b
       size: 32
   drift:
     cmd: python src/drift.py
     deps:
     - path: data/processed/student_features.parquet
       hash: md5
-      md5: 4f4b240b4a1e0227e5d1c0fa348cf6f5
-      size: 39133
+      md5: c600ccf28abb37c6954e5fdb00a4ed36
+      size: 38733
     - path: src/drift.py
       hash: md5
       md5: 44629519096393e933fa23abf60be9c9
@@ -63,5 +63,5 @@ stages:
     outs:
     - path: metrics/drift.json
       hash: md5
-      md5: 446b9f643e98b18c33c1b5cf616335e1
-      size: 541
+      md5: d3c2f60815f50d3a2c8ac6c580d13d95
+      size: 614
